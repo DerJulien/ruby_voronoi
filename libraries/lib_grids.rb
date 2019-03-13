@@ -181,7 +181,7 @@ class Grid
     end
     temp.replace(0,value,1);
     temp.log()
-    add_grid(temp,xx-radius,yy-radius)
+    add_grid(@grid,temp,xx-radius,yy-radius)
   end
   #-----------------------------------------------------
   def backup ()
@@ -199,11 +199,11 @@ class Grid
     @data.each do |subarr| p subarr end
   end
 
-  def add_grid (temp,xs,ys)
-    @grid.each_with_index do |subarr, x|
+  def add_grid (src,temp,xs,ys)
+    src.each_with_index do |subarr, x|
       subarr.each_with_index do |cell, y|
         dx = xx-xs; dy = yy-ys;
-        s(xx,yy, temp.g(dx,dy) );
+        src.s(xx,yy, temp.g(dx,dy) );
       end
     end
   end
