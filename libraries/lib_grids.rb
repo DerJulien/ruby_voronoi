@@ -179,9 +179,9 @@ class Grid
             err += dx - (radius << 1);
         end
     end
-    #temp.replace(0,value,1);
+    temp.replace(0,value,1);
     temp.log()
-    add_grid(@grid,temp,xx-radius,yy-radius)
+    add_grid(temp,xx-radius,yy-radius)
   end
   #-----------------------------------------------------
   def backup ()
@@ -199,8 +199,8 @@ class Grid
     @data.each do |subarr| p subarr end
   end
 
-  def add_grid (src,temp,xs,ys)
-    src.each_with_index do |subarr, x|
+  def add_grid (temp,xs,ys)
+    @data.each_with_index do |subarr, x|
       subarr.each_with_index do |cell, y|
         dx = x-xs; dy = y-ys;
         s(xx,yy, temp.g(dx,dy) );
