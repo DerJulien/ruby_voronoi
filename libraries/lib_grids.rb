@@ -179,7 +179,7 @@ class Grid
             err += dx - (radius << 1);
         end
     end
-    temp.replace(0,value,1);
+    #temp.replace(0,value,1);
     temp.log()
     add_grid(@grid,temp,xx-radius,yy-radius)
   end
@@ -202,8 +202,8 @@ class Grid
   def add_grid (src,temp,xs,ys)
     src.each_with_index do |subarr, x|
       subarr.each_with_index do |cell, y|
-        dx = xx-xs; dy = yy-ys;
-        src.s(xx,yy, temp.g(dx,dy) );
+        dx = x-xs; dy = y-ys;
+        s(xx,yy, temp.g(dx,dy) );
       end
     end
   end
