@@ -10,6 +10,13 @@ class Grid
     @data = Array.new(width) { Array.new(height,value) }
     @backup = @data;
   end
+
+  def get_width()
+    return @width;
+  end
+  def get_height()
+    return @height;
+  end
   #-----------------------------------------------------
   def fill(type=-1)
     @data.each { |subarr| subarr.fill(type) }
@@ -43,7 +50,7 @@ class Grid
   end
   alias :a :add
 
-  def replace (val,newval,mode)
+  def replace(val,newval,mode)
     @data.each do |subarr|
       case mode
         when 0
@@ -52,16 +59,15 @@ class Grid
           subarr.map! { |x| x > val ? newval : x }
         when -1
           subarr.map! { |x| x < val ? newval : x }
-        end
+      end
     end
   end
   #-----------------------------------------------------
-  def set_line (x0,y0,x1,y1,value)
+  def set_line(x0,y0,x1,y1,value)
     dx = (x1-x0).abs     ; sx = x0<x1 ? 1 : -1;
     dy = (y1-y0).abs * -1; sy = y0<y1 ? 1 : -1;
     err = dx + dy; e2 = dx + dy;
 
-    varr = Array.new();
     while (x0!=x1 && y0!=y1) do
 
       s(x0,y0,value);
@@ -74,7 +80,7 @@ class Grid
     end
   end
 
-  def get_line (x0,y0,x1,y1)
+  def get_line(x0,y0,x1,y1)
       dx = (x1-x0).abs     ; sx = x0<x1 ? 1 : -1;
       dy = (y1-y0).abs * -1; sy = y0<y1 ? 1 : -1;
       err = dx + dy; e2 = dx + dy;
@@ -94,7 +100,7 @@ class Grid
       return varr;
   end
 
-  def get_circle (xs,ys,radius)
+  def get_circle(xs,ys,radius)
     varr = Array.new();
     x = radius-1;
     y = 0;
@@ -124,7 +130,7 @@ class Grid
     return varr;
   end
 
-  def set_circle (xs,ys,radius,value)
+  def set_circle(xs,ys,radius,value)
     x = radius-1;
     y = 0;
     dx = 1;
@@ -151,8 +157,8 @@ class Grid
     end
   end
 
-  def add_circle (xs,ys,radius,value)
-    temp = Grid.new(radius* 2 -1,radius* 2 -1,0)
+  def add_circle(xs,ys,radius,value)
+    temp = Grid.new((radius* 2)-1,(radius* 2)-1,0)
     xx = xs; yy = ys;
     xs = radius-1; ys = radius-1;
     x = radius-1;
@@ -161,14 +167,14 @@ class Grid
     dy = 1;
     err = dx - (radius << 1);
     while (x >= y) do
-        temp.a(xs + x, ys + y,value);
-        temp.a(xs + y, ys + x,value);
-        temp.a(xs - y, ys + x,value);
-        temp.a(xs - x, ys + y,value);
-        temp.a(xs - x, ys - y,value);
-        temp.a(xs - y, ys - x,value);
-        temp.a(xs + y, ys - x,value);
-        temp.a(xs + x, ys - y,value);
+        temp.s(xs + x, ys + y,value);
+        temp.s(xs + y, ys + x,value);
+        temp.s(xs - y, ys + x,value);
+        temp.s(xs - x, ys + y,value);
+        temp.s(xs - x, ys - y,value);
+        temp.s(xs - y, ys - x,value);
+        temp.s(xs + y, ys - x,value);
+        temp.s(xs + x, ys - y,value);
         if (err <= 0) then
             y+=1;
             err += dy;
@@ -179,15 +185,15 @@ class Grid
             err += dx - (radius << 1);
         end
     end
-    temp.replace(0,value,1);
     temp.log()
-    add_grid(temp,xx-radius,yy-radius)
+      add_grid(temp,xx-radius,yy-radius)
+    temp = nil;
   end
   #-----------------------------------------------------
-  def backup ()
+  def backup()
     @backup = @data;
   end
-  def import (loadedgrid=@backup)
+  def import(loadedgrid=@backup)
     backup();
     @data = loadedgrid;
   end
@@ -195,20 +201,23 @@ class Grid
     return @data;
   end
   alias :get_all :export
-  def log ()
+  def log()
     @data.each do |subarr| p subarr end
   end
 
-  def add_grid (temp,xs,ys)
+  def add_grid(temp,xs,ys)
+
     @data.each_with_index do |subarr, x|
       subarr.each_with_index do |cell, y|
-        dx = x-xs; dy = y-ys;
-        s(xx,yy, temp.g(dx,dy) );
+        if (x.between?(xs,xs+temp.get_width()-1) && y.between?(ys,ys+temp.get_height()-1))
+          a(x,y,temp.g(x-xs,y-ys));
+        end
       end
     end
+
   end
   #-----------------------------------------------------
-  def normalise_range (lo=0,hi=1)
+  def normalise_range(lo=0,hi=1)
     curlo = (@data.flatten).min;
     curhi = (@data.flatten).max;
     @data.each_with_index do |subarr, x|
@@ -219,11 +228,18 @@ class Grid
     end
   end
 
-  def randomize_points (amount,value,x = rand(@width),y = rand(@height))
+  def randomize_points(amount,value,x = rand(@width),y = rand(@height))
     amount.times do
       while (g(x,y) == value) do x = rand(@width); y = rand(@height); end
         s(x,y,value);
     end
   end
   #-----------------------------------------------------
+  def draw(file)
+    @data.each_with_index do |subarr, x|
+      subarr.each_with_index do |cell, y|
+        file[x,y] = ChunkyPNG::Color.rgba(255, 255, 255, cell.to_i * 255)
+      end
+    end
+  end
 end

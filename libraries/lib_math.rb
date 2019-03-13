@@ -1,4 +1,4 @@
-def range (lo=0, hi=1,dec=2)
+def range(lo=0,hi=1,dec=2)
     val = rand * (hi-lo) + lo
     return val.round(dec)
 end
