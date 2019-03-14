@@ -9,6 +9,7 @@ class Grid
     @width = width; @height = height;
     @data = Array.new(width) { Array.new(height,value) }
     @backup = @data;
+    @points = Array.new();
   end
 
   def get_width()
@@ -185,7 +186,6 @@ class Grid
             err += dx - (radius << 1);
         end
     end
-    temp.log()
       add_grid(temp,xx-radius,yy-radius)
     temp = nil;
   end
@@ -228,18 +228,36 @@ class Grid
     end
   end
 
-  def randomize_points(amount,value,x = rand(@width),y = rand(@height))
+  def randomize_points(amount)
     amount.times do
-      while (g(x,y) == value) do x = rand(@width); y = rand(@height); end
-        s(x,y,value);
-    end
+        x = rand(@width); y = rand(@height);
+        @points.push([x,y])
+      end
+  end
+  def apply_voronoi(file,range)
+    r = range;
+        @points.each do |c|
+          x = c[0]; y = c[1];
+          add_circle(x,y,r,1);
+        end
+      #replace(2,0,-1)
+    #  replace(2,2,1)
   end
   #-----------------------------------------------------
   def draw(file)
     @data.each_with_index do |subarr, x|
       subarr.each_with_index do |cell, y|
-        file[x,y] = ChunkyPNG::Color.rgba(255, 255, 255, cell.to_i * 255)
+        case cell
+          when 1..2
+            file[x,y] =ChunkyPNG::Color.rgba(255, 0, 0, 255)
+          when 0..1
+            file[x,y] =ChunkyPNG::Color.rgba(0, 255, 0, 255)
+        end
       end
+    end
+    @points.each do |c|
+      x = c[0]; y = c[1];
+      file[x,y] =ChunkyPNG::Color.rgba(0, 0, 255, 255)
     end
   end
 end
