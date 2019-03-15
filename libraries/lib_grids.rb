@@ -234,14 +234,14 @@ class Grid
         @points.push([x,y])
       end
   end
-  def apply_voronoi(file,range)
+  def apply_voronoi(range)
     r = range;
         @points.each do |c|
           x = c[0]; y = c[1];
           add_circle(x,y,r,1);
         end
-      #replace(2,0,-1)
-    #  replace(2,2,1)
+      replace(2,0,-1)
+      replace(2,2,1)
   end
   #-----------------------------------------------------
   def draw(file)
